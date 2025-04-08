@@ -1,0 +1,12 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Skill } from './entities/skill.entity';
+import { GenericService } from '../common/generic.service';
+
+@Injectable()
+export class SkillService extends GenericService<Skill> {
+  constructor(@InjectRepository(Skill) repository: Repository<Skill>) {
+    super(repository);
+  }
+}
