@@ -7,6 +7,7 @@ import { Cv } from '../cv/entities/cv.entity';
 import { Skill } from '../skill/entities/skill.entity';
 import { User } from '../user/entities/user.entity';
 import { faker } from '@faker-js/faker';
+import * as bcrypt from 'bcrypt';
 
 async function bootstrap() {
   const app = await NestFactory.createApplicationContext(AppModule);
@@ -23,9 +24,22 @@ async function bootstrap() {
     })
   );
 
-  // Seed CVs
-  const cvs = await Promise.all(
+  // Seed Users and CVs
+  await Promise.all(
     Array.from({ length: 5 }).map(async () => {
+      // Create a User
+      const user = new User();
+      user.username = faker.internet.username();
+      user.email = faker.internet.email();
+
+      // Generate a hashed password
+      const hashedPassword = await bcrypt.hash('password123', 10); // 10 is the salt rounds
+      user.password = hashedPassword;
+      user.role = faker.helpers.arrayElement(['user', 'admin']); // Randomly assign a role
+
+      const savedUser = await userService.create(user);
+
+      // Create a CV for the User
       const cv = new Cv();
       cv.name = faker.person.lastName();
       cv.firstname = faker.person.firstName();
@@ -34,22 +48,9 @@ async function bootstrap() {
       cv.job = faker.person.jobTitle();
       cv.path = faker.internet.url();
       cv.skills = skills;
-      return cvService.create(cv);
-    })
-  );
+      cv.user = savedUser; // Associate the CV with the User
 
-  // Seed Users
-  await Promise.all(
-    cvs.map(async (cv) => {
-      const user = new User();
-      user.username = faker.internet.username();
-      user.email = faker.internet.email();
-      user.password = faker.internet.password();
-      if(!user.cvs){
-        user.cvs = []; // Initialize the cvs array if it doesn't exist
-      }
-      user.cvs.push(cv); // Associate the CV with the user
-      return userService.create(user);
+      return cvService.create(cv);
     })
   );
 

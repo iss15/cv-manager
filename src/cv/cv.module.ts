@@ -4,7 +4,7 @@ import { CvController } from './cv.controller';
 import { CvControllerV2 } from './cv.controller.v2';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Cv } from './entities/cv.entity';
-import { AuthMiddleware } from 'src/common/middlewares/auth.middleware';
+import { AuthMiddleware } from '../common/middlewares/auth.middleware';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Cv])],
@@ -13,7 +13,7 @@ import { AuthMiddleware } from 'src/common/middlewares/auth.middleware';
 })
 export class CvModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(AuthMiddleware).forRoutes(CvController, CvControllerV2);
+    consumer.apply(AuthMiddleware).forRoutes(CvController);
   }
 }
 

@@ -1,6 +1,6 @@
 import { Repository } from 'typeorm';
 import { Injectable } from '@nestjs/common';
-import { PaginationDto } from './dto/pagination.dto';
+import { PaginationDto } from '../dto/pagination.dto';
 
 @Injectable()
 export class GenericService<T extends Record<string, any>> {
